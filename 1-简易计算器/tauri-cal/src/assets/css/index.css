@@ -1,0 +1,104 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.cal {
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    /* border-radius: 15px; */
+    /* box-shadow:  20px 20px 71px #cccccc,
+             -20px -20px 71px #f4f4f4; */
+    /* border-bottom: 2px solid #c1e3f9;
+    border-right: 2px solid #c1e3f9; */
+    /* border-top: 1px solid #f9788a;
+    border-left: 1px solid #f9788a; */
+}
+
+.screenBox {
+    width: 100%;
+    height: 25%;
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    flex-direction: column;
+    padding-left: 35px;
+    padding-right: 35px;
+    box-sizing: border-box;
+}
+
+.screen {
+    text-align: right;
+    font-weight: bold;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: #505050;
+}
+
+.buttonBox {
+    width: 100%;
+    height: 75%;
+    padding-bottom: 20px;
+    padding-left: 45px;
+    padding-right: 45px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 10px;
+    /* border: 1px solid #000; */
+}
+
+.taxs {
+    width: 100%;
+    height: 75%;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+}
+
+.tax {
+    height: 45px;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+input {
+    text-align: center;
+    width: 100px;
+}
+
+.taxInput {
+    height: 35px;
+
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    outline: none;
+    /* border: none; */
+    /* border-inline: none;  */
+}
+
+.grid-item {
+    background-color: #f6f6f6;
+    /* 可选：设置单元格的背景颜色 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    caret-color: transparent;
+    border-radius: 100%;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    font-family: 微软雅黑;
+    color: #505050;
+
+}

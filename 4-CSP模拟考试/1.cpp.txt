@@ -1,0 +1,20 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, a;
+    cin >> n >> a;
+    int m = 0; // 统计落在圆内的点的数量
+    for (int i = 0; i < n; ++i) {
+        double x, y;
+        cin >> x >> y;
+        // 判断点(x,y)是否在圆内（x² + y² ≤ a²）
+        if (x * x + y * y <= a * a) {
+            m++;
+        }
+    }
+    // 计算并输出估算的π值
+    double pi = 4.0 * m / n;
+    cout << pi << endl;
+    return 0;
+}

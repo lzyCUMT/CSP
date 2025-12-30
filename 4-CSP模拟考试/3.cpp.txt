@@ -1,0 +1,166 @@
+#include <bits/stdc++.h>
+
+#define x first
+#define y second
+using namespace std;
+using PSS = pair<string, string>;
+
+int N, S, D;
+string huffmanCode;
+vector<PSS> STable, DTable;
+
+struct Node {
+    char data;
+    Node* left, *right;
+    Node(char d) : data(d), left(nullptr), right(nullptr) {}
+    Node() : data('\0'), left(nullptr), right(nullptr) {}
+};
+
+Node* rebuild(const string& s, int& index) {
+    if (index >= s.length()) return nullptr;
+    if (s[index] == '1') {
+        index++; // 跳过'1'
+        char ch = s[index++]; // 读取字符
+        return new Node(ch);
+    } else if (s[index] == '0') {
+        index++; // 跳过'0'
+        auto node = new Node();
+        node->left = rebuild(s, index);
+        node->right = rebuild(s, index);
+        return node;
+    }
+    return nullptr;
+}
+
+void destroyTree(Node* root) {
+    if (!root) return;
+    destroyTree(root->left), destroyTree(root->right);
+    delete root;
+}
+
+string hexToBinary(const string& hexStr) {
+    // 映射表
+    static const string hexMap[] = {
+            "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 0-7
+            "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"  // 8-f
+    };
+    string res;
+    for (auto &c : hexStr) {
+        res += isdigit(c) ? hexMap[c - '0'] : hexMap[c - 'a' + 10];
+    }
+    return res;
+}
+
+string huffmanDecode(Node* root, const string& binaryStr) {
+    string res;
+    Node* cur= root;
+    for (auto &bit : binaryStr) {
+        cur = (bit == '0' ? cur->left : cur->right);
+        if (!cur->left && !cur->right) {
+            res += cur->data;
+            cur = root;
+        }
+    }
+    return res;
+}
+
+string work(string s, Node* huffmanTree) {
+    if (s.empty()) return s;
+    if (s[0] != 'H') return s;
+    else if (s.size() >= 2 && s[0] == 'H' && s[1] == 'H') return s.substr(1);
+    else { // Huffman编码的字符串
+        if (s.size() < 3) return s;
+        char c1 = s[s.size() - 2], c2 = s[s.size() - 1];
+
+        if (!isdigit(c1) || !isdigit(c2)) return s; // 不是数字 返回成普通字符串
+
+        int cnt = (c1 - '0') * 10 + (c2 - '0');
+        string hexData = s.substr(1, s.size() - 3);
+        string binaryStr = hexToBinary(hexData);
+        // 去掉补的0
+        if (cnt > 0 && binaryStr.size() >= cnt)
+            binaryStr = binaryStr.substr(0, binaryStr.size() - cnt);
+        return huffmanDecode(huffmanTree, binaryStr);
+    }
+}
+
+void insertDTable(const string &k, const string &v) {
+    DTable.insert(DTable.begin(), {k, v});
+    if (DTable.size() > D) {
+        DTable.pop_back();
+    }
+}
+
+PSS getEntry(int index) {
+    if (index <= S) {
+        return STable[index - 1];
+    } else {
+        int idx = index - S - 1;
+        if (idx >= 0 && idx < DTable.size()) {
+            return DTable[idx];
+        }
+    }
+    return {"", ""};
+}
+
+int main() {
+    cin.tie(nullptr)->ios::sync_with_stdio(false);
+    cin >> S >> D;
+    for (int i = 0; i < S; i++) {
+        string k, v;
+        cin >> k >> v;
+        STable.emplace_back(k, v);
+    }
+    cin >> huffmanCode;
+    int index = 0;
+    Node* huffmanTree = rebuild(huffmanCode, index); // 建树
+
+    for (auto &[k, v] : STable) { // 预处理静态表字符串 避免多次cwork出错
+        k = work(k, huffmanTree), v = work(v, huffmanTree);
+    }
+
+    cin >> N;
+    for (int i = 0; i < N; i++) {
+        int op;
+        string k, v;
+        cin >> op;
+        if (op == 1) { // 表格引用指令
+            int idx;
+            cin >> idx;
+            auto entry = getEntry(idx);
+            cout << entry.x << ": " << entry.y << '\n';
+        }
+        else if (op == 2) { // 字面量并索引指令
+            int idx;
+            cin >> idx;
+            if (idx == 0) {
+                cin >> k >> v;
+                string key = work(k, huffmanTree), value = work(v, huffmanTree);
+                cout << key << ": " << value << '\n';
+                insertDTable(key, value);
+            } else {
+                cin >> v;
+                auto entry = getEntry(idx);
+                // 注意已经插入过的key 已经work过不需要再work 重复work可能会出错
+                string key = entry.x, value = work(v, huffmanTree);
+                cout << key << ": " << value << '\n';
+                insertDTable(key, value);
+            }
+        }
+        else if (op == 3) { // 字面量不索引指令
+            int idx;
+            cin >> idx;
+            if (idx == 0) {
+                cin >> k >> v;
+                cout << work(k, huffmanTree) << ": " << work(v, huffmanTree) << '\n';
+            } else {
+                cin >> v;
+                auto entry = getEntry(idx);
+                // 注意已经插入过的key 已经work过不需要再work
+                cout << entry.x << ": " << work(v, huffmanTree)<< '\n';
+            }
+        }
+    }
+    destroyTree(huffmanTree);
+    return 0;
+}
